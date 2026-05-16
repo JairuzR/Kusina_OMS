@@ -12,6 +12,8 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -122,9 +124,27 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::post('/stop-impersonating', [UserController::class, 'stopImpersonating'])->name('stop-impersonating');
     });
 
+    // Audit Logs
+    Route::prefix('audit-logs')->name('audit-logs.')->middleware('role:admin|manager')->group(function () {
+        Route::get('/', [AuditLogController::class, 'index'])->name('index');
+        Route::get('/export', [AuditLogController::class, 'export'])->name('export');
+        Route::get('/{auditLog}', [AuditLogController::class, 'show'])->name('show');
+        Route::delete('/{auditLog}', [AuditLogController::class, 'destroy'])->name('destroy');
+        Route::post('/purge-old', [AuditLogController::class, 'purgeOld'])->name('purge');
+    });
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/{id}/read', [NotificationController::class, 'markRead'])->name('read');
+        Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
+        Route::get('/count', [NotificationController::class, 'unreadCount'])->name('count');
+    });
+
     // Placeholder routes (replaced as we build each module)
     Route::get('/reports', fn() => view('coming-soon', ['page' => 'Reports']))->name('reports.index');
-    Route::get('/audit-logs', fn() => view('coming-soon', ['page' => 'Audit Logs']))->name('audit-logs.index');
     Route::get('/settings', fn() => view('coming-soon', ['page' => 'Settings']))->name('settings.index');
 
 });

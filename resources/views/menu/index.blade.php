@@ -30,31 +30,34 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
 
         {{-- Category Header --}}
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
             <div class="flex items-center gap-3">
                 @if($category->image)
                     <img src="{{ asset('storage/' . $category->image) }}"
-                         class="w-10 h-10 rounded-lg object-cover">
+                        class="w-10 h-10 rounded-lg object-cover ring-2 ring-orange-200">
                 @else
-                    <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
-                        <span class="text-orange-500 font-bold text-sm">{{ substr($category->name, 0, 1) }}</span>
+                    <div class="w-10 h-10 rounded-lg bg-orange-500 flex items-center justify-center flex-shrink-0">
+                        <span class="text-white font-bold text-sm">{{ substr($category->name, 0, 1) }}</span>
                     </div>
                 @endif
                 <div>
-                    <h3 class="font-semibold text-gray-800">{{ $category->name }}</h3>
-                    <p class="text-xs text-gray-400">{{ $category->items_count }} item(s)</p>
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-gray-900 text-base">{{ $category->name }}</h3>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                            {{ $category->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                            {{ $category->is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                        <span class="text-xs text-gray-400">{{ $category->items_count }} item(s)</span>
+                    </div>
+                    <p class="text-xs text-orange-500 font-medium uppercase tracking-wide mt-0.5">Category</p>
                 </div>
-                <span class="ml-2 px-2 py-0.5 rounded-full text-xs
-                    {{ $category->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
-                    {{ $category->is_active ? 'Active' : 'Inactive' }}
-                </span>
             </div>
             @can('edit menu')
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
                 <a href="{{ route('menu.categories.edit', $category) }}"
-                   class="text-xs text-blue-600 hover:underline">Edit</a>
+                class="text-xs text-blue-600 hover:underline">Edit</a>
                 <form action="{{ route('menu.categories.destroy', $category) }}" method="POST"
-                      onsubmit="return confirm('Delete this category and all its items?')">
+                    onsubmit="return confirm('Delete this category and all its items?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="text-xs text-red-500 hover:underline">Delete</button>
