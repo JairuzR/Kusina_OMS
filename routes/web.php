@@ -11,6 +11,7 @@ use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -107,9 +108,22 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::delete('/suppliers/{supplier}', [SupplierController::class, 'destroy'])->name('suppliers.destroy');
     });
 
+    // User Management
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/', [UserController::class, 'store'])->name('store');
+        Route::get('/{user}', [UserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{user}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        Route::patch('/{user}/status', [UserController::class, 'updateStatus'])->name('status');
+        Route::post('/{user}/impersonate', [UserController::class, 'impersonate'])->name('impersonate');
+        Route::post('/stop-impersonating', [UserController::class, 'stopImpersonating'])->name('stop-impersonating');
+    });
+
     // Placeholder routes (replaced as we build each module)
     Route::get('/reports', fn() => view('coming-soon', ['page' => 'Reports']))->name('reports.index');
-    Route::get('/users', fn() => view('coming-soon', ['page' => 'Users']))->name('users.index');
     Route::get('/audit-logs', fn() => view('coming-soon', ['page' => 'Audit Logs']))->name('audit-logs.index');
     Route::get('/settings', fn() => view('coming-soon', ['page' => 'Settings']))->name('settings.index');
 
