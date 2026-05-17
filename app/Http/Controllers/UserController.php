@@ -199,4 +199,29 @@ class UserController extends Controller
         return redirect()->route('users.index')
             ->with('success', 'Returned to your account.');
     }
+
+    public function forceLogout(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot force logout yourself.');
+        }
+
+        // Delete all sessions for this user
+        \DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->delete();
+
+        AuditLog::create([
+            'user_id'     => auth()->id(),
+            'action'      => 'force_logout',
+            'module'      => 'users',
+            'model_type'  => User::class,
+            'model_id'    => $user->id,
+            'description' => 'Force logged out user ' . $user->name,
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+        ]);
+
+        return back()->with('success', $user->name . ' has been logged out from all devices.');
+    }
 }

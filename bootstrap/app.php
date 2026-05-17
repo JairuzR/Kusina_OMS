@@ -12,14 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role'         => \App\Http\Middleware\RoleMiddleware::class,
-            'check.status' => \App\Http\Middleware\CheckUserStatus::class,
-            'log.activity' => \App\Http\Middleware\LogUserActivity::class,
-            'permission'   => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'role'               => \App\Http\Middleware\RoleMiddleware::class,
+            'check.status'       => \App\Http\Middleware\CheckUserStatus::class,
+            'log.activity'       => \App\Http\Middleware\LogUserActivity::class,
+            'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role.or.permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-    ]);
+            'session.timeout'    => \App\Http\Middleware\SessionTimeout::class,
+        ]);
 
-    $middleware->append(\App\Http\Middleware\CheckUserStatus::class);
+        $middleware->append(\App\Http\Middleware\CheckUserStatus::class);
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+        $middleware->append(\App\Http\Middleware\SessionTimeout::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -59,6 +59,16 @@
                         </button>
                     </form>
 
+                    {{-- Force Logout --}}
+                    <form action="{{ route('users.force-logout', $user) }}" method="POST"
+                        onsubmit="return confirm('Force logout {{ $user->name }} from all devices?')">
+                        @csrf
+                        <button type="submit"
+                            class="w-full bg-red-100 text-red-700 hover:bg-red-200 py-2 rounded-lg text-sm transition">
+                            Force Logout
+                        </button>
+                    </form>
+
                     {{-- Status Change --}}
                     <form action="{{ route('users.status', $user) }}" method="POST" class="flex gap-2">
                         @csrf

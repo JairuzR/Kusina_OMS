@@ -137,6 +137,7 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::patch('/{user}/status', [UserController::class, 'updateStatus'])->name('status');
         Route::post('/{user}/impersonate', [UserController::class, 'impersonate'])->name('impersonate');
         Route::post('/stop-impersonating', [UserController::class, 'stopImpersonating'])->name('stop-impersonating');
+        Route::post('/{user}/force-logout', [UserController::class, 'forceLogout'])->name('force-logout');
     });
 
     // Audit Logs

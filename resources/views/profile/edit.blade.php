@@ -11,9 +11,21 @@
         <h2 class="text-base font-semibold text-gray-900 mb-1">Profile Information</h2>
         <p class="text-sm text-gray-500 mb-6">Update your name, email address and phone number.</p>
 
-        <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
+        <form method="POST" action="{{ route('profile.update') }}" class="space-y-4" enctype="multipart/form-data">
             @csrf
             @method('patch')
+
+            {{-- Avatar --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
+                <div class="flex items-center gap-4">
+                    <img src="{{ auth()->user()->avatar_url }}"
+                        class="w-16 h-16 rounded-full object-cover border border-gray-200">
+                    <input type="file" name="avatar" accept="image/*"
+                        class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                </div>
+                @error('avatar')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
+            </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
