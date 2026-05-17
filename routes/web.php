@@ -26,6 +26,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+// MFA Routes — outside auth middleware
+Route::get('/mfa/verify', [MfaController::class, 'show'])->name('mfa.verify');
+Route::post('/mfa/verify', [MfaController::class, 'verify'])->name('mfa.verify.submit');
+Route::post('/mfa/resend', [MfaController::class, 'resend'])->name('mfa.resend');
+
 Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -34,6 +39,9 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // MFA toggle
+    Route::post('/mfa/toggle', [MfaController::class, 'toggle'])->name('mfa.toggle');
 
     // Menu Management
     Route::prefix('menu')->name('menu.')->group(function () {
@@ -196,15 +204,6 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::get('/reports/inventory',       [PdfController::class, 'inventoryReport'])->name('reports.inventory');
     });
 
-    // MFA
-    Route::middleware('guest')->group(function () {
-        Route::get('/mfa/verify', [MfaController::class, 'show'])->name('mfa.verify');
-        Route::post('/mfa/verify', [MfaController::class, 'verify'])->name('mfa.verify.submit');
-        Route::post('/mfa/resend', [MfaController::class, 'resend'])->name('mfa.resend');
-    });
-
-    // MFA toggle
-    Route::post('/mfa/toggle', [MfaController::class, 'toggle'])->name('mfa.toggle');
 });
 
 require __DIR__.'/auth.php';

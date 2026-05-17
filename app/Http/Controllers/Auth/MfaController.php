@@ -61,7 +61,14 @@ class MfaController extends Controller
         session()->forget(['mfa_user_id', 'mfa_remember']);
         $request->session()->regenerate();
 
-        AuditLog::record('login', 'auth', description: 'User logged in with MFA', request: $request);
+        AuditLog::create([
+            'user_id'     => $user->id,
+            'action'      => 'login',
+            'module'      => 'auth',
+            'description' => 'User logged in with MFA',
+            'ip_address'  => $request->ip(),
+            'user_agent'  => $request->userAgent(),
+        ]);
 
         return redirect()->intended(route('dashboard'));
     }

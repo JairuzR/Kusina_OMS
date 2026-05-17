@@ -27,7 +27,6 @@ class AuthenticatedSessionController extends Controller
 
         // Check MFA
         if ($user->mfa_enabled) {
-            // Generate OTP
             $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
             $user->update([
@@ -35,14 +34,13 @@ class AuthenticatedSessionController extends Controller
                 'mfa_code_expires_at' => now()->addMinutes(5),
             ]);
 
-            // Store in session, log out temporarily
-            session([
-                'mfa_user_id' => $user->id,
-                'mfa_remember' => $request->boolean('remember'),
-            ]);
+            // Store BEFORE logout
+            $request->session()->put('mfa_user_id', $user->id);
+            $request->session()->put('mfa_remember', $request->boolean('remember'));
+            $request->session()->save();
+
             Auth::logout();
 
-            // Send OTP email
             Mail::to($user->email)->send(new MfaOtpMail($code, $user->name));
 
             return redirect()->route('mfa.verify');
