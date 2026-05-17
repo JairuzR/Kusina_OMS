@@ -14,7 +14,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Admin User',
                 'email'    => 'admin@kusinaoms.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Admin@1234'),
                 'role'     => 'admin',
                 'status'   => 'active',
                 'phone'    => '+63 912 000 0001',
@@ -22,7 +22,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Manager User',
                 'email'    => 'manager@kusinaoms.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Manager@1234'),
                 'role'     => 'manager',
                 'status'   => 'active',
                 'phone'    => '+63 912 000 0002',
@@ -30,7 +30,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Cashier User',
                 'email'    => 'cashier@kusinaoms.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Cashier@1234'),
                 'role'     => 'cashier',
                 'status'   => 'active',
                 'phone'    => '+63 912 000 0003',
@@ -38,7 +38,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Waiter User',
                 'email'    => 'waiter@kusinaoms.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Waiter@1234'),
                 'role'     => 'waiter',
                 'status'   => 'active',
                 'phone'    => '+63 912 000 0004',
@@ -46,7 +46,7 @@ class AdminUserSeeder extends Seeder
             [
                 'name'     => 'Kitchen Staff',
                 'email'    => 'kitchen@kusinaoms.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('Kitchen@1234'),
                 'role'     => 'kitchen_staff',
                 'status'   => 'active',
                 'phone'    => '+63 912 000 0005',
