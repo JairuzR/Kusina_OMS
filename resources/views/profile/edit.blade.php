@@ -1,29 +1,122 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+@section('title', 'My Profile')
+@section('page-title', 'My Profile')
+
+@section('content')
+<div class="max-w-3xl mx-auto py-6 space-y-6">
+
+    {{-- Update Profile Info --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-base font-semibold text-gray-900 mb-1">Profile Information</h2>
+        <p class="text-sm text-gray-500 mb-6">Update your name, email address and phone number.</p>
+
+        <form method="POST" action="{{ route('profile.update') }}" class="space-y-4">
+            @csrf
+            @method('patch')
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                @error('name')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" required>
+                @error('email')<p class="text-red-500 text-xs mt-1">{{ $message }}</p>@enderror
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
             </div>
-        </div>
+
+            <div class="flex items-center gap-4 pt-2">
+                <button type="submit"
+                    class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    Save Changes
+                </button>
+                @if(session('status') === 'profile-updated')
+                    <p class="text-sm text-green-600">Saved successfully!</p>
+                @endif
+            </div>
+        </form>
     </div>
-</x-app-layout>
+
+    {{-- Change Password --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-base font-semibold text-gray-900 mb-1">Change Password</h2>
+        <p class="text-sm text-gray-500 mb-6">Make sure to use a strong password.</p>
+
+        <form method="POST" action="{{ route('password.update') }}" class="space-y-4">
+            @csrf
+            @method('put')
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                <input type="password" name="current_password"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                @error('current_password', 'updatePassword')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                <input type="password" name="password"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                @error('password', 'updatePassword')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" name="password_confirmation"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+            </div>
+
+            <div class="flex items-center gap-4 pt-2">
+                <button type="submit"
+                    class="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                    Update Password
+                </button>
+                @if(session('status') === 'password-updated')
+                    <p class="text-sm text-green-600">Password updated!</p>
+                @endif
+            </div>
+        </form>
+    </div>
+
+    {{-- Delete Account --}}
+    <div class="bg-white rounded-xl shadow-sm border border-red-200 p-6">
+        <h2 class="text-base font-semibold text-red-600 mb-1">Delete Account</h2>
+        <p class="text-sm text-gray-500 mb-6">Once deleted, all data will be permanently removed.</p>
+
+        <form method="POST" action="{{ route('profile.destroy') }}"
+            onsubmit="return confirm('Are you sure? This cannot be undone.')">
+            @csrf
+            @method('delete')
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm your password</label>
+                <input type="password" name="password"
+                    class="w-full border border-red-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                @error('password', 'userDeletion')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition">
+                Delete My Account
+            </button>
+        </form>
+    </div>
+
+</div>
+@endsection
