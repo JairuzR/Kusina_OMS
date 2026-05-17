@@ -20,6 +20,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\InventoryAIController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\PdfController;
+use App\Http\Controllers\Auth\MfaController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -194,6 +195,16 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::get('/reports/sales',           [PdfController::class, 'salesReport'])->name('reports.sales');
         Route::get('/reports/inventory',       [PdfController::class, 'inventoryReport'])->name('reports.inventory');
     });
+
+    // MFA
+    Route::middleware('guest')->group(function () {
+        Route::get('/mfa/verify', [MfaController::class, 'show'])->name('mfa.verify');
+        Route::post('/mfa/verify', [MfaController::class, 'verify'])->name('mfa.verify.submit');
+        Route::post('/mfa/resend', [MfaController::class, 'resend'])->name('mfa.resend');
+    });
+
+    // MFA toggle
+    Route::post('/mfa/toggle', [MfaController::class, 'toggle'])->name('mfa.toggle');
 });
 
 require __DIR__.'/auth.php';

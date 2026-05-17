@@ -92,6 +92,33 @@
         </form>
     </div>
 
+
+     {{-- MFA Toggle --}}
+     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+         <h2 class="text-base font-semibold text-gray-900 mb-1">Two-Factor Authentication</h2>
+         <p class="text-sm text-gray-500 mb-4">
+             Add an extra layer of security. When enabled, you'll receive a 6-digit code via email each time you log in.
+         </p>
+
+         <div class="flex items-center justify-between">
+             <span class="text-sm font-medium {{ auth()->user()->mfa_enabled ? 'text-green-600' : 'text-gray-500' }}">
+                 {{ auth()->user()->mfa_enabled ? 'Enabled' : 'Disabled' }}
+             </span>
+
+             <form method="POST" action="{{ route('mfa.toggle') }}">
+                 @csrf
+                 <button type="submit"
+                     class="{{ auth()->user()->mfa_enabled
+                         ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                         : 'bg-green-100 text-green-700 hover:bg-green-200' }}
+                         text-sm font-medium px-4 py-2 rounded-lg transition">
+                     {{ auth()->user()->mfa_enabled ? 'Disable MFA' : 'Enable MFA' }}
+                 </button>
+             </form>
+         </div>
+     </div>
+
+
     {{-- Delete Account --}}
     <div class="bg-white rounded-xl shadow-sm border border-red-200 p-6">
         <h2 class="text-base font-semibold text-red-600 mb-1">Delete Account</h2>

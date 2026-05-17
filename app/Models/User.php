@@ -22,6 +22,9 @@ class User extends Authenticatable
         'phone',
         'last_login_at',
         'last_login_ip',
+        'mfa_enabled',
+        'mfa_code',
+        'mfa_code_expires_at',
     ];
 
     protected $hidden = [
@@ -33,6 +36,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'last_login_at'     => 'datetime',
         'password'          => 'hashed',
+        'mfa_enabled'       => 'boolean',
     ];
 
     public function isAdmin(): bool
