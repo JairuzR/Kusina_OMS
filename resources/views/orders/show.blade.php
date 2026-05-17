@@ -22,16 +22,27 @@
                             {{ ucfirst($order->type) }}
                         </p>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-sm font-medium
-                        @if($order->status === 'completed') bg-green-100 text-green-700
-                        @elseif($order->status === 'pending') bg-yellow-100 text-yellow-700
-                        @elseif($order->status === 'preparing') bg-blue-100 text-blue-700
-                        @elseif($order->status === 'ready') bg-purple-100 text-purple-700
-                        @elseif($order->status === 'billed') bg-orange-100 text-orange-700
-                        @elseif($order->status === 'cancelled') bg-red-100 text-red-600
-                        @else bg-gray-100 text-gray-600 @endif">
-                        {{ ucfirst($order->status) }}
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                            @if($order->status === 'completed') bg-green-100 text-green-700
+                            @elseif($order->status === 'pending') bg-yellow-100 text-yellow-700
+                            @elseif($order->status === 'preparing') bg-blue-100 text-blue-700
+                            @elseif($order->status === 'ready') bg-purple-100 text-purple-700
+                            @elseif($order->status === 'billed') bg-orange-100 text-orange-700
+                            @elseif($order->status === 'cancelled') bg-red-100 text-red-600
+                            @else bg-gray-100 text-gray-600 @endif">
+                            {{ ucfirst($order->status) }}
+                        </span>
+                        @if($order->payment)
+                        <a href="{{ route('pdf.order.receipt', $order) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-lg hover:bg-gray-900 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Download Receipt
+                        </a>
+                        @endif
+                    </div>
                 </div>
 
                 {{-- Items --}}

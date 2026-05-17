@@ -36,4 +36,9 @@ class InventoryItem extends Model
     {
         return $this->quantity <= $this->min_quantity;
     }
+
+    public function aiSuggestion()
+    {
+        return $this->hasOne(AiReorderSuggestion::class)->latest();
+    }
 }

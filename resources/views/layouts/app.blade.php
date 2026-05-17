@@ -135,6 +135,17 @@
             </a>
             @endcan
 
+            @can('view inventory')
+            <a href="{{ route('inventory.ai.dashboard') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('inventory.ai.*') ? 'active-nav' : '' }}"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+                AI Suggestions
+            </a>
+            @endcan
+
             @can('view reports')
             <a href="{{ route('reports.index') }}"
                class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('reports.*') ? 'active-nav' : '' }}">
@@ -145,12 +156,32 @@
             </a>
             @endcan
 
+            @can('view reports')
+            <a href="{{ route('import.index') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('import.*') ? 'active-nav' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Import / Export
+            </a>
+            @endcan
+
             {{-- Admin Section --}}
             @canany(['view users', 'view audit logs', 'view settings'])
             <div class="pt-4 pb-2">
                 <p class="px-3 text-xs font-semibold uppercase tracking-wider" style="color:#6b7280;">Administration</p>
             </div>
             @endcanany
+
+            @can('view settings')
+            <a href="{{ route('backups.index') }}"
+            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('backups.*') ? 'active-nav' : '' }}">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                </svg>
+                Backups
+            </a>
+            @endcan
 
             @can('view users')
             <a href="{{ route('users.index') }}"

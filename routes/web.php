@@ -14,6 +14,12 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\ImportController;
+use App\Http\Controllers\InventoryAIController;
+use App\Http\Controllers\BackupController;
+use App\Http\Controllers\PdfController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -141,12 +147,53 @@ Route::middleware(['auth', 'verified', 'check.status'])->group(function () {
         Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
         Route::get('/count', [NotificationController::class, 'unreadCount'])->name('count');
+        Route::get('/feed', [NotificationController::class, 'feed'])->name('feed');
     });
 
-    // Placeholder routes (replaced as we build each module)
-    Route::get('/reports', fn() => view('coming-soon', ['page' => 'Reports']))->name('reports.index');
-    Route::get('/settings', fn() => view('coming-soon', ['page' => 'Settings']))->name('settings.index');
+    // Reports
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/export', [ReportController::class, 'exportCsv'])->name('export');
+    });
 
+    // Settings
+    Route::prefix('settings')->name('settings.')->middleware('can:view settings')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('index');
+        Route::post('/', [SettingController::class, 'update'])->name('update');
+    });
+
+    // Import
+    Route::prefix('import')->name('import.')->group(function () {
+        Route::get('/', [ImportController::class, 'index'])->name('index');
+        Route::get('/template/menu', [ImportController::class, 'downloadMenuTemplate'])->name('template.menu');
+        Route::get('/template/inventory', [ImportController::class, 'downloadInventoryTemplate'])->name('template.inventory');
+        Route::post('/menu', [ImportController::class, 'importMenu'])->name('menu');
+        Route::post('/inventory', [ImportController::class, 'importInventory'])->name('inventory');
+    });
+
+    // Inventory AI
+    Route::post('/inventory/{inventoryItem}/ai-suggest', [InventoryAIController::class, 'suggest'])
+        ->name('inventory.ai.suggest');
+    Route::patch('/inventory/ai/suggestions/{suggestion}/acted', [InventoryAIController::class, 'markActedOn'])
+        ->name('inventory.ai.acted');
+    Route::get('/inventory/ai/dashboard', [InventoryAIController::class, 'dashboard'])
+        ->name('inventory.ai.dashboard');
+
+    // Backup System
+    Route::prefix('backups')->name('backups.')->middleware('role:admin|manager')->group(function () {
+        Route::get('/',                   [BackupController::class, 'index'])->name('index');
+        Route::post('/',                  [BackupController::class, 'store'])->name('store');
+        Route::get('/{backup}/download',  [BackupController::class, 'download'])->name('download');
+        Route::post('/{backup}/verify',   [BackupController::class, 'verify'])->name('verify');
+        Route::delete('/{backup}',        [BackupController::class, 'destroy'])->name('destroy');
+    });
+
+    // PDF Generation
+    Route::prefix('pdf')->name('pdf.')->group(function () {
+        Route::get('/orders/{order}/receipt',  [PdfController::class, 'orderReceipt'])->name('order.receipt');
+        Route::get('/reports/sales',           [PdfController::class, 'salesReport'])->name('reports.sales');
+        Route::get('/reports/inventory',       [PdfController::class, 'inventoryReport'])->name('reports.inventory');
+    });
 });
 
 require __DIR__.'/auth.php';
