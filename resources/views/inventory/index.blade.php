@@ -1,8 +1,6 @@
 @extends('layouts.app')
-
 @section('title', 'Inventory - KusinaOMS')
 @section('page-title', 'Inventory')
-
 @section('content')
 <div class="mt-4">
 
@@ -93,6 +91,13 @@
                                 <a href="{{ route('inventory.edit', $item) }}"
                                    class="text-gray-600 hover:underline text-xs">Edit</a>
                                 @endcan
+                                <form action="{{ route('inventory.ai.suggest', $item) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit"
+                                            class="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full hover:bg-indigo-200 transition">
+                                        AI Suggest
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>

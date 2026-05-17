@@ -20,14 +20,14 @@ class InventoryAIService
         AiReorderSuggestion::where('inventory_item_id', $item->id)->delete();
 
         $suggestion = AiReorderSuggestion::create([
-            'inventory_item_id'          => $item->id,
-            'suggested_quantity'         => $parsed['suggested_quantity'],
-            'urgency'                    => $parsed['urgency'],
-            'reasoning'                  => $parsed['reasoning'],
-            'recommended_supplier'       => $parsed['recommended_supplier'],
-            'key_insights'               => $parsed['key_insights'],
+            'inventory_item_id'             => $item->id,
+            'suggested_quantity'            => $parsed['suggested_quantity'],
+            'urgency'                       => $parsed['urgency'],
+            'reasoning'                     => $parsed['reasoning'],
+            'recommended_supplier'          => $parsed['recommended_supplier'],
+            'key_insights'                  => $parsed['key_insights'],
             'estimated_days_until_stockout' => $parsed['estimated_days_until_stockout'],
-            'provider_used'              => $result['provider'],
+            'provider_used'                 => $result['provider'],
         ]);
 
         Log::channel('ai_audit')->info('AI Reorder Suggestion Generated', [
@@ -45,10 +45,13 @@ class InventoryAIService
     private function buildPrompt(InventoryItem $item): string
     {
         $supplier = $item->supplier?->name ?? 'No supplier assigned';
+        $category = $item->category ?? 'Uncategorized';
+        $location = $item->storage_location ?? 'Not specified';
         $recentTx = $item->transactions()->latest()->take(5)->get();
 
         $txLines = $recentTx->map(function ($tx) {
-            return "- {$tx->type}: {$tx->quantity} {$tx->inventory_item->unit ?? ''} ({$tx->reason}) on {$tx->created_at->format('M d')}";
+            $unit = $tx->inventoryItem->unit ?? '';
+            return "- {$tx->type}: {$tx->quantity} {$unit} ({$tx->reason}) on {$tx->created_at->format('M d')}";
         })->implode("\n");
 
         if (empty($txLines)) {
@@ -56,38 +59,38 @@ class InventoryAIService
         }
 
         return <<<PROMPT
-You are an expert restaurant inventory manager. Analyze this inventory item and provide a reorder recommendation.
+    You are an expert restaurant inventory manager. Analyze this inventory item and provide a reorder recommendation.
 
-ITEM DETAILS:
-- Name: {$item->name}
-- Current Stock: {$item->quantity} {$item->unit}
-- Minimum Threshold: {$item->min_quantity} {$item->unit}
-- Cost Per Unit: ₱{$item->cost_per_unit}
-- Supplier: {$supplier}
-- Category: {$item->category ?? 'Uncategorized'}
-- Storage Location: {$item->storage_location ?? 'Not specified'}
+    ITEM DETAILS:
+    - Name: {$item->name}
+    - Current Stock: {$item->quantity} {$item->unit}
+    - Minimum Threshold: {$item->min_quantity} {$item->unit}
+    - Cost Per Unit: ₱{$item->cost_per_unit}
+    - Supplier: {$supplier}
+    - Category: {$category}
+    - Storage Location: {$location}
 
-RECENT TRANSACTIONS (last 5):
-{$txLines}
+    RECENT TRANSACTIONS (last 5):
+    {$txLines}
 
-Provide your analysis in EXACTLY this JSON format (raw JSON only, no markdown):
-{
-  "suggested_quantity": 50,
-  "urgency": "high",
-  "reasoning": "2-3 sentence explanation of why this quantity and urgency level.",
-  "recommended_supplier": "Supplier name or null",
-  "key_insights": ["insight one", "insight two", "insight three"],
-  "estimated_days_until_stockout": 3
-}
+    Provide your analysis in EXACTLY this JSON format (raw JSON only, no markdown):
+    {
+    "suggested_quantity": 50,
+    "urgency": "high",
+    "reasoning": "2-3 sentence explanation of why this quantity and urgency level.",
+    "recommended_supplier": "Supplier name or null",
+    "key_insights": ["insight one", "insight two", "insight three"],
+    "estimated_days_until_stockout": 3
+    }
 
-Rules:
-- urgency must be exactly one of: low, medium, high, critical
-- suggested_quantity must be a positive number
-- key_insights must be 2 to 4 short phrases
-- estimated_days_until_stockout must be an integer or null
-- Return ONLY the JSON object, nothing else
-CRITICAL: Your entire response must be a single valid JSON object. No text before or after.
-PROMPT;
+    Rules:
+    - urgency must be exactly one of: low, medium, high, critical
+    - suggested_quantity must be a positive number
+    - key_insights must be 2 to 4 short phrases
+    - estimated_days_until_stockout must be an integer or null
+    - Return ONLY the JSON object, nothing else
+    CRITICAL: Your entire response must be a single valid JSON object. No text before or after.
+    PROMPT;
     }
 
     private function parseResponse(string $rawText): array
@@ -107,11 +110,11 @@ PROMPT;
                 'error' => json_last_error_msg(),
             ]);
             return [
-                'suggested_quantity'          => $item->min_quantity * 2 ?? 10,
-                'urgency'                     => 'medium',
-                'reasoning'                   => 'Analysis could not be parsed. Please try again.',
-                'recommended_supplier'        => null,
-                'key_insights'                => [],
+                'suggested_quantity'            => 10,
+                'urgency'                       => 'medium',
+                'reasoning'                     => 'Analysis could not be parsed. Please try again.',
+                'recommended_supplier'          => null,
+                'key_insights'                  => [],
                 'estimated_days_until_stockout' => null,
             ];
         }
@@ -122,11 +125,11 @@ PROMPT;
             : 'medium';
 
         return [
-            'suggested_quantity'          => max(1, (float) ($data['suggested_quantity'] ?? 10)),
-            'urgency'                     => $urgency,
-            'reasoning'                   => substr($data['reasoning'] ?? 'No reasoning provided.', 0, 1000),
-            'recommended_supplier'        => $data['recommended_supplier'] ?? null,
-            'key_insights'                => array_slice($data['key_insights'] ?? [], 0, 4),
+            'suggested_quantity'            => max(1, (float) ($data['suggested_quantity'] ?? 10)),
+            'urgency'                       => $urgency,
+            'reasoning'                     => substr($data['reasoning'] ?? 'No reasoning provided.', 0, 1000),
+            'recommended_supplier'          => $data['recommended_supplier'] ?? null,
+            'key_insights'                  => array_slice($data['key_insights'] ?? [], 0, 4),
             'estimated_days_until_stockout' => isset($data['estimated_days_until_stockout'])
                 ? (int) $data['estimated_days_until_stockout']
                 : null,

@@ -113,7 +113,7 @@
 
                     <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                         <p class="text-xs text-gray-400">Last analyzed: {{ $suggestion->updated_at->diffForHumans() }}</p>
-                        <div class="flex gap-2">
+                        <div class="flex items-center gap-2">
                             @if(!$suggestion->is_acted_on)
                             <form action="{{ route('inventory.ai.acted', $suggestion) }}" method="POST">
                                 @csrf
