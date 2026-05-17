@@ -1,58 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KusinaOMS — Restaurant Operations Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web-based system that digitizes restaurant floor operations for small restaurants in the Philippines. Built with Laravel 13, Tailwind CSS, and MySQL.
 
-## About Laravel
+## Problem Being Solved
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Small restaurants rely on manual processes — handwritten orders, verbal kitchen communication, paper inventory — causing lost orders, stockouts, and inaccurate sales tracking. KusinaOMS digitizes the entire operation.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** Laravel 13, PHP 8.3
+- **Frontend:** Blade Templates, Tailwind CSS, Alpine.js, Chart.js
+- **Database:** MySQL 8.x
+- **Auth:** Laravel Breeze + Spatie Laravel Permission
+- **PDF:** barryvdh/laravel-dompdf
+- **AI:** Google Gemini API + Ollama (llama3.2) fallback
+- **Queue:** Laravel Database Queue
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Role-based access control (Admin, Manager, Cashier, Waiter, Kitchen Staff)
+- Order management with live kitchen display
+- Table management with visual floor map
+- Reservation system
+- Menu management with categories and item toggling
+- Inventory tracking with stock adjustments and supplier management
+- AI-powered reorder suggestions (Gemini + Ollama)
+- Audit logging for all system actions
+- Notifications system with bell dropdown
+- Reports with charts and CSV/PDF export
+- PDF receipt generation (thermal 80mm layout)
+- Site settings management
+- Backup system with manual trigger and email notification
+- Import/Export via CSV templates
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installation
 
 ```bash
-composer require laravel/boost --dev
+git clone https://github.com/yourusername/kusina-oms.git
+cd kusina-oms
 
-php artisan boost:install
+composer install
+npm install
+
+cp .env.example .env
+php artisan key:generate
+
+# Configure your database in .env
+php artisan migrate --seed
+
+npm run build
+php artisan storage:link
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Environment Variables
 
-## Contributing
+```env
+DB_DATABASE=kusina_oms
+DB_USERNAME=root
+DB_PASSWORD=
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-2.0-flash
 
-## Code of Conduct
+OLLAMA_ENABLED=true
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+QUEUE_CONNECTION=database
+MAIL_MAILER=smtp
+```
 
-## Security Vulnerabilities
+## Queue Worker (required for AI suggestions)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+php artisan queue:work --queue=ai-tasks
+```
 
-## License
+## Test Accounts
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Role    | Email                 | Password |
+| ------- | --------------------- | -------- |
+| Admin   | admin@kusinaoms.com   | password |
+| Manager | manager@kusinaoms.com | password |
+| Cashier | cashier@kusinaoms.com | password |
+| Waiter  | waiter@kusinaoms.com  | password |
+| Kitchen | kitchen@kusinaoms.com | password |
+
+## Project Structure
+
+app/
+├── Console/Commands/ # BackupDatabase scheduled command
+├── Http/Controllers/ # All feature controllers
+├── Jobs/ # GenerateReorderSuggestion queue job
+├── Mail/ # BackupCompletedMail
+├── Models/ # Eloquent models
+├── Notifications/ # GeneralNotification
+├── Providers/ # AppServiceProvider
+└── Services/ # AIServiceManager, InventoryAIService
+resources/views/
+├── audit-logs/
+├── backups/
+├── import/
+├── inventory/
+├── layouts/ # app.blade.php (main layout)
+├── menu/
+├── notifications/
+├── orders/
+├── pdf/ # PDF templates
+├── reports/
+├── reservations/
+├── settings/
+├── tables/
+└── users/
