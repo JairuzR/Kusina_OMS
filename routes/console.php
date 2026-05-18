@@ -10,7 +10,11 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Dynamic backup schedule driven by Site Settings
-$schedule = Setting::get('backup_schedule', 'weekly');
+try {
+    $schedule = Setting::get('backup_schedule', 'weekly');
+} catch (\Exception $e) {
+    $schedule = 'weekly';
+}
 
 match ($schedule) {
     'daily'   => Schedule::command('backup:database --type=scheduled')->dailyAt('02:00'),
