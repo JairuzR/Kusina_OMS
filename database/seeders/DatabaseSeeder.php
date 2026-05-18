@@ -10,9 +10,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleAndPermissionSeeder::class,
-            <!-- RestaurantSeeder::class, -->
+            // RestaurantSeeder::class,
             AdminUserSeeder::class,
-            <!-- DemoDataSeeder::class, -->
+            // DemoDataSeeder::class,
         ]);
     }
 }
